@@ -1,0 +1,52 @@
+Data = pd.read_csv("/content/framingham.csv")
+Data.info()
+Data.drop(['education'], axis=1, inplace=True)
+Data.isnull().sum()
+
+Data.dropna(axis = 0, inplace = True)
+print(Data.shape[0])
+Data.isnull().sum()
+Y = Data.TenYearCHD.values
+X = Data.drop(['TenYearCHD'], axis = 1)
+
+sc= StandardScaler()
+X = sc.fit_transform(X)
+
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=42)
+
+# Split the dataset into train and test sets
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=42)
+
+# Display the entire train set
+print("Train set:")
+print(X_train)
+
+# Display the entire test set
+print("Test set:")
+print(X_test)
+
+X_train = pd.DataFrame(X_train)
+X_test = pd.DataFrame(X_test)
+Y_train = pd.DataFrame(Y_train)
+Y_test = pd.DataFrame(Y_test)
+# Split the dataset into train and test sets
+#X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=42)
+
+# Display the shapes of train and test sets
+print("Train set shape:", X_train.shape, Y_train.shape)
+print("Test set shape:", X_test.shape, Y_test.shape)
+
+# Display a sample of the train set
+print("Train set sample:")
+print(X_train.head())
+
+# Display a sample of the test set
+print("Test set sample:")
+print(X_test.head())
+
+le = LabelEncoder()
+Y_train = le.fit_transform(Y_train)
+Y_test = le.transform(Y_test)
+
+
+
