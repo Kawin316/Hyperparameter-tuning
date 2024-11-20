@@ -1,0 +1,302 @@
+model = svm.SVC(kernel='rbf',C=30,gamma='auto')
+model.fit(X_train,Y_train)
+model.score(X_test, Y_test)
+
+# Define and train the logistic regression model
+logistic_model = LogisticRegression()
+logistic_model.fit(X_train, Y_train)
+
+# Calculate the accuracy of the logistic regression model on the test set
+accuracy = logistic_model.score(X_test, Y_test)
+print("Accuracy:", accuracy)
+
+# Define the logistic regression model
+logistic_model = LogisticRegression(C=10, solver='liblinear')
+
+# Perform cross-validation with 5 folds
+# Here, we're using 5-fold cross-validation
+scores = cross_val_score(logistic_model, X, Y, cv=5)
+
+# Print the cross-validation scores
+print("Cross-validation scores:", scores)
+
+# Calculate and print the mean cross-validation score
+print("Mean cross-validation score:", scores.mean())
+
+# Encode the target variable
+le = LabelEncoder()
+Y = le.fit_transform(Y)
+
+# Run the cross-validation again
+logistic_reg = LogisticRegression(C=10, solver='liblinear')
+scores = cross_val_score(logistic_reg, X, Y, cv=30)
+scores
+#logistic_reg = LogisticRegression(C=10, solver='liblinear')
+#scores = cross_val_score(logistic_reg, X, Y, cv=5)
+#scores
+#cross_val_score(svm.SVC(kernel='linear',C=10,gamma='auto'),X, Y, cv=5)
+
+
+
+logistic_reg = LogisticRegression(C=1, solver='newton-cg')
+scores = cross_val_score(logistic_reg, X, Y, cv=30)
+scores
+#cross_val_score(svm.SVC(kernel='rbf',C=10,gamma='auto'),X, Y, cv=5)
+
+
+
+logistic_reg = LogisticRegression(C=10, solver='lbfgs')
+scores = cross_val_score(logistic_reg, X, Y, cv=30)
+scores
+#cross_val_score(svm.SVC(kernel='rbf',C=20,gamma='auto'),X, Y, cv=5)
+
+
+
+logistic_reg = LogisticRegression(C=10, solver='liblinear')
+solver = ['liblinear', 'newton-cg','lbfgs','sag']
+C = [1,10,20]
+avg_scores = {}
+for sol in solver:
+    for cval in C:
+        cv_scores = cross_val_score(logistic_reg,X, Y, cv=5)
+        avg_scores[sol + '_' + str(cval)] = np.average(cv_scores)
+
+
+
+
+from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.linear_model import LogisticRegression
+import pandas as pd
+from sklearn.metrics import make_scorer
+scoring = make_scorer(accuracy_score)
+# Load your custom dataset (replace this with your dataset loading code)
+# For example:
+# data = pd.read_csv('custom_dataset.csv')
+# X = data.drop(columns=['target_column'])
+# y = data['target_column']
+
+# Split the dataset into train and test sets
+# Replace X and y with your features and target variable
+# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Define the logistic regression model
+logistic_model = LogisticRegression()
+
+# Define the parameter grid for GridSearchCV
+param_grid = {
+    'C': [0.001, 0.01, 0.1, 1, 10, 100],  # Inverse regularization strength
+    'penalty': ['l1', 'l2']  # Regularization penalty ('l1' or 'l2')
+}
+
+# Perform grid search with 5-fold cross-validation
+grid_search = GridSearchCV(
+    estimator=logistic_model,
+    param_grid=param_grid,
+    cv=5,  # Number of cross-validation folds
+    scoring=scoring,  # Scoring metric
+    n_jobs=-1  # Number of parallel jobs (-1 uses all available cores)
+)
+
+# Fit the grid search model to the training data
+# Replace X_train and y_train with your training data
+grid_search.fit(X_train, Y_train)
+
+# Print the best hyperparameters found
+print("Best Hyperparameters:", grid_search.best_params_)
+
+# Print the best cross-validation score
+print("Best Cross-Validation Score:", grid_search.best_score_)
+
+# Evaluate the best model on the test set
+# Replace X_test and y_test with your test data
+accuracy = grid_search.score(X_test, Y_test)
+print("Test Accuracy:", accuracy)
+
+
+
+
+
+from sklearn.model_selection import GridSearchCV
+# Split the dataset into train and test sets
+#X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=42)
+
+# Define the logistic regression model
+logistic_model = LogisticRegression()
+
+# Define the parameter grid for GridSearchCV
+param_grid = {
+    'C': [0.001, 0.01, 0.1, 1, 10, 100],  # Inverse regularization strength
+    'penalty': ['l1', 'l2']  # Regularization penalty ('l1' or 'l2')
+}
+
+# Perform grid search with 5-fold cross-validation
+grid_search = GridSearchCV(
+    estimator=logistic_model,
+    param_grid=param_grid,
+    cv=5,  # Number of cross-validation folds
+    scoring='accuracy',  # Scoring metric
+    n_jobs=-1,  # Number of parallel jobs (-1 uses all available cores)
+)
+
+# Fit the grid search model to the training data
+grid_search.fit(X_train, Y_train)
+
+# Print the best hyperparameters found
+print("Best Hyperparameters:", grid_search.best_params_)
+
+# Print the best cross-validation score
+print("Best Cross-Validation Score:", grid_search.best_score_)
+
+# Evaluate the best model on the test set
+accuracy = grid_search.score(X_test, Y_test)
+print("Test Accuracy:", accuracy)
+
+
+
+df = pd.DataFrame(grid_search.cv_results_)
+
+grid_search.best_score_
+
+
+rs = RandomizedSearchCV(svm.SVC(gamma='auto'), {
+        'C': [1,10,20],
+        'kernel': ['rbf','linear']
+    },
+    cv=5,
+    return_train_score=False,
+    n_iter=2
+)
+rs.fit(X, Y)
+pd.DataFrame(rs.cv_results_)[['param_C','param_kernel','mean_test_score']]
+
+
+
+from sklearn.model_selection import train_test_split, RandomizedSearchCV
+from sklearn.linear_model import LogisticRegression
+from scipy.stats import uniform
+
+# Split the dataset into train and test sets
+#X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=42)
+
+# Define the logistic regression model
+logistic_model = LogisticRegression()
+
+# Define the parameter distribution for random search
+param_space = {
+    'C': (1e-6, 100.0, 'log-uniform'),  # Inverse regularization strength
+    'penalty': ['l2'],  # Regularization penalty ('l1' or 'l2')
+}
+
+# Perform random search with 5 iterations
+random_search = RandomizedSearchCV(
+    estimator=logistic_model,
+    param_distributions=param_space,
+    n_iter=5,  # Number of parameter settings to sample
+    cv=5,  # Number of cross-validation folds
+    scoring='accuracy',  # Scoring metric
+    random_state=42,  # Random state for reproducibility
+    n_jobs=-1  # Number of parallel jobs (-1 uses all available cores)
+)
+
+# Fit the model to the training data
+random_search.fit(X_train, Y_train)
+
+# Print the best hyperparameters found
+print("Best Hyperparameters:", random_search.best_params_)
+
+# Print the best cross-validation score
+print("Best Cross-Validation Score:", random_search.best_score_)
+
+# Evaluate the best model on the test set
+accuracy = random_search.score(X_test, Y_test)
+print("Test Accuracy:", accuracy)
+
+
+
+model_params = {
+    'svm': {
+        'model': svm.SVC(gamma='auto'),
+        'params' : {
+            'C': [1,10,20],
+            'kernel': ['rbf','linear']
+        }
+    },
+    'random_forest': {
+        'model': RandomForestClassifier(),
+        'params' : {
+            'n_estimators': [1,5,10]
+        }
+    },
+    'logistic_regression' : {
+        'model': LogisticRegression(solver='liblinear',multi_class='auto'),
+        'params': {
+            'C': [1,5,10]
+        }
+    },
+    'naive_bayes_gaussian': {
+        'model': GaussianNB(),
+        'params': {}
+    },
+}
+
+
+scores = []
+
+for model_name, mp in model_params.items():
+    clf =  GridSearchCV(mp['model'], mp['params'], cv=5, return_train_score=False)
+    clf.fit(X, Y)
+    scores.append({
+        'model': model_name,
+        'best_score': clf.best_score_,
+        'best_params': clf.best_params_
+    })
+    grid_search.fit(X_train, Y_train)
+
+df = pd.DataFrame(scores,columns=['model','best_score','best_params'])
+df
+
+
+
+
+
+#from sklearn.model_selection import train_test_split
+#from sklearn.linear_model import LogisticRegression
+from skopt import BayesSearchCV
+
+# Split the dataset into train and test sets
+#X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=42)
+
+# Define the logistic regression model
+logistic_model = LogisticRegression()
+
+# Define the search space for hyperparameters
+# Define the search space for hyperparameters
+param_space = {
+    'C': (1e-6, 100.0, 'log-uniform'),  # Inverse regularization strength
+    'penalty': ['l2'],  # Regularization penalty ('l1' or 'l2')
+}
+
+# Perform Bayesian hyperparameter tuning with 5-fold cross-validation
+opt = BayesSearchCV(
+    logistic_model,
+    param_space,
+    cv=5,
+    n_iter=50,  # Number of parameter settings sampled
+    scoring='accuracy',  # Scoring metric
+    n_jobs=-1  # Number of parallel jobs (-1 uses all available cores)
+)
+
+# Fit the model to the training data
+opt.fit(X_train, Y_train)
+
+# Print the best hyperparameters found
+print("Best Hyperparameters:", opt.best_params_)
+
+# Print the best cross-validation score
+print("Best Cross-Validation Score:", opt.best_score_)
+
+# Evaluate the best model on the test set
+accuracy = opt.score(X_test, Y_test)
+print("Test Accuracy:", accuracy)
+
+
